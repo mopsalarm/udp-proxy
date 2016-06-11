@@ -2,14 +2,19 @@ package main
 
 import (
 	"flag"
-	"net"
 	"github.com/Sirupsen/logrus"
+	"net"
 )
 
 func main() {
 	source := flag.String("source", ":5000", "Source port to listen on")
 	target := flag.String("target", "127.0.0.1:5001", "Target address to forward to")
+	quiet := flag.Bool("quiet", false, "Do not print info logging.")
 	flag.Parse()
+
+	if *quiet {
+		logrus.SetLevel(logrus.WarnLevel)
+	}
 
 	sourceAddress, err := net.ResolveUDPAddr("udp", *source)
 	if err != nil {
@@ -25,7 +30,7 @@ func main() {
 
 	sourceConnection, err := net.ListenUDP("udp", sourceAddress)
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not listen on address:", *source);
+		logrus.WithError(err).Fatal("Could not listen on address:", *source)
 		return
 	}
 
@@ -33,12 +38,12 @@ func main() {
 
 	targetConnection, err := net.DialUDP("udp", nil, targetAddress)
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not 'connect' to target address:", *target);
+		logrus.WithError(err).Fatal("Could not 'connect' to target address:", *target)
 		return
 	}
 
 	for {
-		buffer := make([]byte, 64 * 1024)
+		buffer := make([]byte, 64*1024)
 		n, addr, err := sourceConnection.ReadFromUDP(buffer)
 
 		if err != nil {
@@ -52,4 +57,3 @@ func main() {
 		}
 	}
 }
-
