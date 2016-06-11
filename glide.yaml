@@ -1,0 +1,4 @@
+package: github.com/mopsalarm/udp-proxy
+import:
+- package: github.com/Sirupsen/logrus
+  version: ^0.10.0
